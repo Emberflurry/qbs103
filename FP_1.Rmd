@@ -1,0 +1,104 @@
+---
+title: "Data Wrangling I"
+author: "John DeForest"
+date: "July 15, 2024"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+``` {r}
+
+g1 = read.csv('C:\\Users\\John DeForest\\Desktop\\qbs103 R DS\\QBS103_GSE157103_genes.csv')
+sm1 = read.csv('C:\\Users\\John DeForest\\Desktop\\qbs103 R DS\\QBS103_GSE157103_series_matrix-1.csv')
+#gene, metadata
+
+print(head(g1))
+#assign first column name as "Gene"
+colnames(g1)[1] = 'Gene'
+print(head(g1))
+
+print(head(sm1))
+
+gene_sel = 'A1CF' #2
+
+#extract gene data from that row
+grow = g1[g1$Gene == gene_sel,-1] #select rows where Gene is A1CF
+print(grow)
+
+#transpose 
+growtp = data.frame(participant_id = colnames(g1)[-1],
+expression = as.numeric(grow)) 
+#convert to data frame with pid and expression(of gene A1CF)
+
+print(head(growtp))
+
+#add metadata by merge w sm1
+mg = merge(growtp,sm1,by='participant_id') #merge by participant_id
+print(head(mg))
+
+#Gene: A1CF
+#ContinuousCovariate: Age (numeric)
+#CategoricalCovariate: sex (male/female)
+#CategoricalCovariate: mechanical_ventilation (yes/no)
+
+#1 histogram of gene expression (for A1CF)
+
+library(ggplot2)
+summary(mg$expression)
+hist(mg$expression) #duh
+
+#2 Scatterplot of Gene Expression and Age
+ggplot(mg, aes(x = age, y = expression)) + #merged data, expression vals vs age vals
+  geom_point() +
+  labs(title = paste("Scatterplot of", gene_sel, "Expression vs Age"),
+       x = "Age (years)",
+       y = paste(gene_sel, "Expression ")) + #likely log2-ed for value range, compresses a bit for viewing 
+  theme_minimal()
+
+  #explanation: Gene A1CF and Covariate Age: doesnt seem to be a strong relationship visually between age 
+  #and the A1CF expression values, although the data is a little bit sparse. 
+  #A1CF expressions are somewhat quantized at 0 and .01 (log2). definitely more values at 0.
+  # more analysis of other genes, covariates needed. no linear regression here, 
+  #but fairly visually obvious a lack of correlation
+
+
+# boxplot params opt: outlier.shape = 21, outlier.size = 2, alpha = 0.8
+#3: Boxplot of gene expression 
+#separated by both categorical covariates (sex, mechanical_ventilation(1st)) 
+ggplot(mg, aes(x = mechanical_ventilation, y = expression, fill = sex)) +
+  geom_boxplot() +
+  
+  labs(
+    title = "Gene Expression of A1CF by Mechanical Ventilation and Sex",
+    x = "Mechanical Ventilation", #primary x separation
+    y = "A1CF Expression (log2)",
+    fill = "Sex" #secondary separation
+  ) +
+  theme_minimal()
+
+
+
+#3: optional reverse of categorical nesting levels (dif interp potentially )
+ggplot(mg, aes(x = sex, y = expression, fill = mechanical_ventilation)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("darkgreen", "grey50")) +
+  labs(
+    title = "Gene Expression of A1CF by Sex and Mechanical Ventilation",
+    x = "Sex", #swapped w mechanical_ventilation from above
+    y = "A1CF Expression (log2)",
+    fill = "Mechanical Ventilation"
+  ) +
+  theme_minimal()
+
+  #explanation:
+
+
+print(mg$age)
+```
+
+End of part 1. knit boio
+
+$~$

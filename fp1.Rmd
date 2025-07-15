@@ -1,0 +1,6 @@
+
+```{r}
+g1 <- read.csv('C:\Users\John DeForest\Desktop\qbs103 R DS\QBS103_GSE157103_genes.csv')
+sm1 <- read.csv('C:\Users\John DeForest\Desktop\qbs103 R DS\QBS103_GSE157103_series_matrix-1.csv')
+
+```
