@@ -102,3 +102,7 @@ print(mg$age)
 End of part 1. knit boio
 
 $~$
+```{r}
+#lactate.mmol.l.
+print((mg$lactate.mmol.l.))
+```
